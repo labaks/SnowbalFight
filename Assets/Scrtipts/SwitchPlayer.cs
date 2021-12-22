@@ -5,36 +5,34 @@ using UnityEngine.UI;
 
 public class SwitchPlayer : MonoBehaviour
 {
-    public GameObject[] players;
-    public GameObject currentPlayer;
-
-    public GameObject ShootBtn;
+    public GameObject player;
     Shooting shooting;
+
     void Start()
     {
-        shooting = ShootBtn.GetComponent<Shooting>();
+        shooting = player.GetComponent<Shooting>();
         switchTo(0);
     }
 
-    // Update is called once per frame
-    void Update() { }
-
     public void switchTo(int id)
     {
-        foreach (GameObject p in players)
+        foreach (Transform child in player.transform)
         {
-            switcher(p, true);
+            switcher(child, true, id);
         }
-        switcher(players[id], false);
+        switcher(player.transform.GetChild(id), false, id);
     }
 
-    void switcher(GameObject player, bool clean)
+    void switcher(Transform player, bool clean, int id)
     {
         MoveByTouch mover = player.GetComponent<MoveByTouch>();
-        mover.currentPlayer = !clean;
-        var tempColor = mover.button.GetComponent<Image>().color;
+        if (!clean)
+        {
+            mover.rb = mover.players[id].GetComponent<Rigidbody>();
+        }
+        var tempColor = gameObject.transform.GetChild(0).GetChild(id).GetComponent<Image>().color;
         tempColor.a = clean ? .4f : 1f;
-        mover.button.GetComponent<Image>().color = tempColor;
+        gameObject.transform.GetChild(0).GetChild(id).GetComponent<Image>().color = tempColor;
         player.transform.GetChild(0).gameObject.SetActive(!clean);
         shooting.firePoint = player.transform.GetChild(1).gameObject.transform;
     }

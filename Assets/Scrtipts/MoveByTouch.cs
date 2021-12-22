@@ -4,12 +4,10 @@ public class MoveByTouch : MonoBehaviour
 {
     [SerializeField]
     float speed = 3f;
-    [SerializeField]
-    public GameObject button;
 
-    Rigidbody rb;
+    public GameObject[] players;
 
-    public bool currentPlayer = false;
+    public Rigidbody rb;
 
     Touch touch;
     Vector3 touchPosition,
@@ -23,7 +21,7 @@ public class MoveByTouch : MonoBehaviour
 
     void Start()
     {
-        rb = gameObject.GetComponent<Rigidbody>();
+        rb = players[0].GetComponent<Rigidbody>();
     }
 
     void Update()
@@ -31,7 +29,7 @@ public class MoveByTouch : MonoBehaviour
         if (isMoving)
             currentDistanceToTouchPos = (touchPosition - transform.position).magnitude;
 
-        if (Input.touchCount > 0 && currentPlayer)
+        if (Input.touchCount > 0)
         {
             for (int i = 0; i < Input.touchCount; i++)
             {
@@ -70,11 +68,4 @@ public class MoveByTouch : MonoBehaviour
         if (isMoving)
             previousDistanceToTouchPos = (touchPosition - transform.position).magnitude;
     }
-    // void Update()
-    // {
-    //     if (Input.GetMouseButton(0))
-    //     {
-    //         GoToClick(Input.mousePosition);
-    //     }
-    // }
 }
