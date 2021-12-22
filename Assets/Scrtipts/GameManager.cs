@@ -8,9 +8,34 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public GameObject PlayerPrefab;
-    // Start is called before the first frame update
-    void Start() {
-        PhotonNetwork.Instantiate(PlayerPrefab.name, Vector3.zero, Quaternion.identity);
+    public GameObject masterSpawnPoint,
+        clientSpawnPoint;
+    public GameObject light;
+    public GameObject shootBtn;
+
+    GameObject player;
+
+    void Start()
+    {
+        GameObject spawnPoint = PhotonNetwork.IsMasterClient ? masterSpawnPoint : clientSpawnPoint;
+
+        player = PhotonNetwork.Instantiate(
+            PlayerPrefab.name,
+            spawnPoint.transform.position,
+            Quaternion.identity
+        );
+        player.name = "MasterPlayer";
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            player.name = "ClientPlayer";
+            Camera.main.transform.RotateAround(new Vector3(0, 0, 0), Vector3.up, 180);
+            light.transform.RotateAround(new Vector3(0, 0, 0), Vector3.up, 180);
+        }
+        if (player.GetComponent<PhotonView>().IsMine)
+        {
+            shootBtn.GetComponent<OnShoot>().player = player;
+            shootBtn.GetComponent<OnShoot>().InitButton();
+        }
     }
 
     // Update is called once per frame

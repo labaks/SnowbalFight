@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class Bullet : MonoBehaviour
+public class Bullet : MonoBehaviourPun
 {
     public GameObject hitEffect;
     public int attackDamage = 30;
@@ -14,8 +15,10 @@ public class Bullet : MonoBehaviour
         // }
         // GameObject effect = Instantiate(hitEffect, transform.position, Quaternion.identity);
         // Destroy(effect, 5f);
-        if (collision.gameObject.name != "Hero")
-            Destroy(gameObject);
+        // if (collision.gameObject.name != "Hero")
+
+        collision.gameObject.GetComponent<IDamagable>()?.TakeDamage(attackDamage);
+        Destroy(gameObject);
     }
 
     private void Update()

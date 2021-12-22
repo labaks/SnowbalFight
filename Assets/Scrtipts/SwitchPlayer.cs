@@ -6,11 +6,11 @@ using UnityEngine.UI;
 public class SwitchPlayer : MonoBehaviour
 {
     public GameObject player;
-    Shooting shooting;
+    // Shooting shooting;
 
     void Start()
     {
-        shooting = player.GetComponent<Shooting>();
+        // shooting = player.GetComponent<Shooting>();
         switchTo(0);
     }
 
@@ -34,6 +34,6 @@ public class SwitchPlayer : MonoBehaviour
         tempColor.a = clean ? .4f : 1f;
         gameObject.transform.GetChild(0).GetChild(id).GetComponent<Image>().color = tempColor;
         player.transform.GetChild(0).gameObject.SetActive(!clean);
-        shooting.firePoint = player.transform.GetChild(1).gameObject.transform;
+        // shooting.firePoint = player.transform.GetChild(1).gameObject.transform;
     }
 }

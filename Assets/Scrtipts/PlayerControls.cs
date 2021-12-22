@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerControls : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class PlayerControls : MonoBehaviour
 
     [SerializeField]
     float speed = 5f;
-    Rigidbody rb;
+    Rigidbody currentBodyRb;
     Touch touch;
     Vector3 touchPosition,
         whereToMove;
@@ -18,25 +19,33 @@ public class PlayerControls : MonoBehaviour
         currentDistanceToTouchPos;
     float distance;
 
-    bool clicked = false;
-
     Vector3 targetPosition,
         lookAtTarget;
     Quaternion playerRot;
 
     float rotSpeed = 5f;
 
-    CharacterController currentBodyController;
-    Transform currentBodyTransform;
+    Transform[] children = new Transform[3];
+
+    public Transform currentBodyTransform;
+
+    Quaternion startAngle;
+
+    Quaternion startRotation;
 
     void Start()
     {
         photonView = GetComponent<PhotonView>();
-        rb = transform.GetChild(0).gameObject.GetComponent<Rigidbody>();
-        currentBodyController = transform
-            .GetChild(0)
-            .gameObject.GetComponent<CharacterController>();
-        currentBodyTransform = transform.GetChild(0);
+        if (!PhotonNetwork.IsMasterClient && photonView.IsMine)
+        {
+            Debug.Log("I'm not master");
+            transform.Rotate(0.0f, 180.0f, 0.0f, Space.Self);
+        }
+        GetChildren();
+        currentBodyTransform = children[0];
+        currentBodyRb = currentBodyTransform.gameObject.GetComponent<Rigidbody>();
+
+        startRotation = currentBodyTransform.rotation;
     }
 
     void Update()
@@ -46,11 +55,23 @@ public class PlayerControls : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
             SetTargetPosition();
         }
         if (isMoving)
         {
             Move();
+        }
+        if (currentBodyTransform.position == targetPosition)
+        {
+            currentBodyTransform.rotation = Quaternion.Slerp(
+                currentBodyTransform.rotation,
+                startRotation,
+                rotSpeed * Time.deltaTime
+            );
         }
     }
 
@@ -61,10 +82,9 @@ public class PlayerControls : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 1000))
         {
             targetPosition = hit.point;
-            // currentBodyTransform.LookAt(targetPosition);
             lookAtTarget = new Vector3(
                 targetPosition.x - currentBodyTransform.position.x,
-                currentBodyTransform.position.y,
+                0,
                 targetPosition.z - currentBodyTransform.position.z
             );
             playerRot = Quaternion.LookRotation(lookAtTarget);
@@ -86,6 +106,16 @@ public class PlayerControls : MonoBehaviour
         );
         if (currentBodyTransform.position == targetPosition)
             isMoving = false;
+    }
+
+    void GetChildren()
+    {
+        List<Transform> tempList = new List<Transform>();
+        foreach (Transform child in transform)
+        {
+            tempList.Add(child);
+        }
+        children = tempList.ToArray();
     }
     // void Update()
     // {
@@ -119,7 +149,7 @@ public class PlayerControls : MonoBehaviour
     //                 {
     //                     touchPosition = hit.point;
     //                     whereToMove = (hit.point - transform.position).normalized;
-    //                     rb.velocity = new Vector3(whereToMove.x * speed, 0, whereToMove.z * speed);
+    //                     currentBodyRb.velocity = new Vector3(whereToMove.x * speed, 0, whereToMove.z * speed);
     //                 }
     //             }
     //         }
@@ -129,7 +159,7 @@ public class PlayerControls : MonoBehaviour
     //     if (currentDistanceToTouchPos > previousDistanceToTouchPos)
     //     {
     //         isMoving = false;
-    //         rb.velocity = Vector3.zero;
+    //         currentBodyRb.velocity = Vector3.zero;
     //     }
 
     //     if (isMoving)
