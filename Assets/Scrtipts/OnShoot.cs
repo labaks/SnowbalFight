@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class OnShoot : MonoBehaviourPun
+public class OnShoot : MonoBehaviourPunCallbacks
 {
     public GameObject bulletPrefab;
     public float bulletForce = 50f;
+    public GameObject player;
 
     Button button;
-    public GameObject player;
     Transform firePoint;
     PlayerControls playerControls;
 
@@ -24,6 +24,12 @@ public class OnShoot : MonoBehaviourPun
     void Shoot()
     {
         firePoint = playerControls.currentBodyTransform.GetChild(1);
+        player.GetComponent<PhotonView>().RPC("RPCShoot", RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void RPCShoot()
+    {
         Invoke("MakeBullet", .3f);
     }
 

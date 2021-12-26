@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks
@@ -14,6 +15,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public GameObject shootBtn;
 
     GameObject player;
+    Button button;
 
     void Start()
     {
@@ -33,9 +35,15 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         if (player.GetComponent<PhotonView>().IsMine)
         {
-            shootBtn.GetComponent<OnShoot>().player = player;
-            shootBtn.GetComponent<OnShoot>().InitButton();
+            InitButton();
         }
+    }
+
+    void InitButton()
+    {
+        PlayerControls playerControls = player.GetComponent<PlayerControls>();
+        button = shootBtn.GetComponent<Button>();
+        button.onClick.AddListener(playerControls.Shoot);
     }
 
     // Update is called once per frame

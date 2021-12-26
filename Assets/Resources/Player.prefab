@@ -50,6 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   currentBodyTransform: {fileID: 0}
+  BulletPrefab: {fileID: 7014584256961518145, guid: d9183db1b9e8b8040b4e83f3bacb8094, type: 3}
 --- !u!114 &5234678287634951142
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -28,6 +28,8 @@ public class PlayerControls : MonoBehaviour
     Transform[] children = new Transform[3];
 
     public Transform currentBodyTransform;
+    public GameObject BulletPrefab;
+    Transform firePoint;
 
     Quaternion startAngle;
 
@@ -46,6 +48,7 @@ public class PlayerControls : MonoBehaviour
         currentBodyRb = currentBodyTransform.gameObject.GetComponent<Rigidbody>();
 
         startRotation = currentBodyTransform.rotation;
+        firePoint = currentBodyTransform.GetChild(1);
     }
 
     void Update()
@@ -106,6 +109,23 @@ public class PlayerControls : MonoBehaviour
         );
         if (currentBodyTransform.position == targetPosition)
             isMoving = false;
+    }
+
+    public void Shoot()
+    {
+        photonView.RPC("RPCFire", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void RPCFire(PhotonMessageInfo info)
+    {
+        float lag = (float)(PhotonNetwork.Time - info.SentServerTime);
+        GameObject bullet;
+
+        bullet = Instantiate(BulletPrefab, firePoint.position, Quaternion.identity) as GameObject;
+        bullet
+            .GetComponent<Bullet>()
+            .InitializeBullet(firePoint.forward, firePoint, Mathf.Abs(lag));
     }
 
     void GetChildren()
