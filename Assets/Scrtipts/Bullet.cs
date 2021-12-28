@@ -16,22 +16,18 @@ public class Bullet : MonoBehaviourPun
 
     // public void OnCollisionEnter(Collision collision)
     // {
-    //     // if (collision.gameObject.GetComponent<EnemyController>() != null)
-    //     // {
-    //     //     collision.gameObject.GetComponent<EnemyController>().TakeDamage(attackDamage);
-    //     // }
     //     // GameObject effect = Instantiate(hitEffect, transform.position, Quaternion.identity);
     //     // Destroy(effect, 5f);
-    //     // if (collision.gameObject.name != "Hero")
-    //     Debug.Log(collision.gameObject.name);
-    //     collision.gameObject.GetComponent<IDamagable>()?.TakeDamage(attackDamage);
-    //     Destroy(gameObject);
     // }
 
-    private void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other)
+    {
         Debug.Log(other.gameObject.name);
-        other.gameObject.GetComponent<IDamagable>()?.TakeDamage(attackDamage);
-        Destroy(gameObject);
+        if (other.gameObject.GetComponent<PhotonView>() && !other.gameObject.GetComponent<PhotonView>().IsMine)
+        {
+            other.gameObject.GetComponent<IDamagable>()?.TakeDamage(attackDamage);
+            Destroy(gameObject);
+        }
     }
 
     public void InitializeBullet(Vector3 originalDirection, Transform firePoint, float lag)

@@ -12,10 +12,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     public GameObject masterSpawnPoint,
         clientSpawnPoint;
     public GameObject light;
-    public GameObject shootBtn;
+    public GameObject shootBtnGO;
+    public GameObject[] switcherBtns;
 
     GameObject player;
-    Button button;
+    Button shootBtn;
 
     void Start()
     {
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         if (player.GetComponent<PhotonView>().IsMine)
         {
+            player.GetComponent<PlayerControls>().GameManager = this;
             InitButton();
         }
     }
@@ -42,8 +44,31 @@ public class GameManager : MonoBehaviourPunCallbacks
     void InitButton()
     {
         PlayerControls playerControls = player.GetComponent<PlayerControls>();
-        button = shootBtn.GetComponent<Button>();
-        button.onClick.AddListener(playerControls.Shoot);
+        shootBtnGO.GetComponent<Button>().onClick.AddListener(playerControls.Shoot);
+        switcherBtns[0]
+            .GetComponent<Button>()
+            .onClick.AddListener(
+                delegate
+                {
+                    playerControls.switchPlayer(0);
+                }
+            );
+        switcherBtns[1]
+            .GetComponent<Button>()
+            .onClick.AddListener(
+                delegate
+                {
+                    playerControls.switchPlayer(1);
+                }
+            );
+        switcherBtns[2]
+            .GetComponent<Button>()
+            .onClick.AddListener(
+                delegate
+                {
+                    playerControls.switchPlayer(2);
+                }
+            );
     }
 
     // Update is called once per frame

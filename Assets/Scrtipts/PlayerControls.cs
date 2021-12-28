@@ -2,38 +2,20 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class PlayerControls : MonoBehaviour
 {
+    public GameObject BulletPrefab;
+    public GameManager GameManager;
     private PhotonView photonView;
 
-    [SerializeField]
-    float speed = 5f;
-    Rigidbody currentBodyRb;
-    Touch touch;
-    Vector3 touchPosition,
-        whereToMove;
-    bool isMoving = false;
-    float previousDistanceToTouchPos,
-        currentDistanceToTouchPos;
-    float distance;
-
-    Vector3 targetPosition,
-        lookAtTarget;
-    Quaternion playerRot;
-
-    float rotSpeed = 5f;
-
-    Transform[] children = new Transform[3];
-
-    public Transform currentBodyTransform;
-    public GameObject BulletPrefab;
+    bool canShoot = true;
+    PlayerBody[] children = new PlayerBody[3];
+    PlayerBody currentBody;
     Transform firePoint;
-
-    Quaternion startAngle;
-
-    Quaternion startRotation;
+    Vector3 lookAtTarget;
 
     void Start()
     {
@@ -44,11 +26,8 @@ public class PlayerControls : MonoBehaviour
             transform.Rotate(0.0f, 180.0f, 0.0f, Space.Self);
         }
         GetChildren();
-        currentBodyTransform = children[0];
-        currentBodyRb = currentBodyTransform.gameObject.GetComponent<Rigidbody>();
-
-        startRotation = currentBodyTransform.rotation;
-        firePoint = currentBodyTransform.GetChild(1);
+        currentBody = children[0];
+        firePoint = currentBody.transform.GetChild(1);
     }
 
     void Update()
@@ -64,17 +43,9 @@ public class PlayerControls : MonoBehaviour
             }
             SetTargetPosition();
         }
-        if (isMoving)
+        if (Mathf.Abs(currentBody.transform.rotation.y - currentBody.startRotation.y) <= 0.05f)
         {
-            Move();
-        }
-        if (currentBodyTransform.position == targetPosition)
-        {
-            currentBodyTransform.rotation = Quaternion.Slerp(
-                currentBodyTransform.rotation,
-                startRotation,
-                rotSpeed * Time.deltaTime
-            );
+            canShoot = true;
         }
     }
 
@@ -84,36 +55,48 @@ public class PlayerControls : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 1000))
         {
-            targetPosition = hit.point;
+            currentBody.targetPosition = hit.point;
             lookAtTarget = new Vector3(
-                targetPosition.x - currentBodyTransform.position.x,
+                currentBody.targetPosition.x - currentBody.transform.position.x,
                 0,
-                targetPosition.z - currentBodyTransform.position.z
+                currentBody.targetPosition.z - currentBody.transform.position.z
             );
-            playerRot = Quaternion.LookRotation(lookAtTarget);
-            isMoving = true;
+            currentBody.playerRot = Quaternion.LookRotation(lookAtTarget);
+            currentBody.isMoving = true;
+            canShoot = false;
         }
     }
 
-    void Move()
+    public void switchPlayer(int id)
     {
-        currentBodyTransform.rotation = Quaternion.Slerp(
-            currentBodyTransform.rotation,
-            playerRot,
-            rotSpeed * Time.deltaTime
-        );
-        currentBodyTransform.position = Vector3.MoveTowards(
-            currentBodyTransform.position,
-            targetPosition,
-            speed * Time.deltaTime
-        );
-        if (currentBodyTransform.position == targetPosition)
-            isMoving = false;
+        cleanSwitcher();
+        currentBody = children[id];
+        currentBody.transform.GetChild(0).gameObject.SetActive(true);
+        firePoint = currentBody.transform.GetChild(1);
+
+        var tempColor = GameManager.switcherBtns[id].GetComponent<Image>().color;
+        tempColor.a = 1f;
+        GameManager.switcherBtns[id].GetComponent<Image>().color = tempColor;
+    }
+
+    void cleanSwitcher()
+    {
+        foreach (PlayerBody body in children)
+        {
+            body.transform.GetChild(0).gameObject.SetActive(false);
+        }
+        foreach (GameObject button in GameManager.switcherBtns)
+        {
+            var tempColor = button.GetComponent<Image>().color;
+            tempColor.a = .4f;
+            button.GetComponent<Image>().color = tempColor;
+        }
     }
 
     public void Shoot()
     {
-        photonView.RPC("RPCFire", RpcTarget.All);
+        if (canShoot)
+            photonView.RPC("RPCFire", RpcTarget.All);
     }
 
     [PunRPC]
@@ -130,61 +113,11 @@ public class PlayerControls : MonoBehaviour
 
     void GetChildren()
     {
-        List<Transform> tempList = new List<Transform>();
+        List<PlayerBody> tempList = new List<PlayerBody>();
         foreach (Transform child in transform)
         {
-            tempList.Add(child);
+            tempList.Add(child.GetComponent<PlayerBody>());
         }
         children = tempList.ToArray();
     }
-    // void Update()
-    // {
-    //     if (!photonView.IsMine)
-    //         return;
-
-    //     if (isMoving)
-    //         currentDistanceToTouchPos = (whereToMove - transform.position).magnitude;
-
-    //     if (Input.touchCount > 0)
-    //     {
-    //         for (int i = 0; i < Input.touchCount; i++)
-    //         {
-    //             touch = Input.touches[i];
-    //             if (
-    //                 UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(
-    //                     touch.fingerId
-    //                 )
-    //             )
-    //                 return;
-
-    //             if (touch.phase == TouchPhase.Began)
-    //             {
-    //                 previousDistanceToTouchPos = 0;
-    //                 currentDistanceToTouchPos = 0;
-    //                 isMoving = true;
-
-    //                 Ray ray = Camera.main.ScreenPointToRay(touch.position);
-    //                 RaycastHit hit;
-    //                 if (Physics.Raycast(ray, out hit))
-    //                 {
-    //                     touchPosition = hit.point;
-    //                     whereToMove = (hit.point - transform.position).normalized;
-    //                     currentBodyRb.velocity = new Vector3(whereToMove.x * speed, 0, whereToMove.z * speed);
-    //                 }
-    //             }
-    //         }
-    //     }
-
-
-    //     if (currentDistanceToTouchPos > previousDistanceToTouchPos)
-    //     {
-    //         isMoving = false;
-    //         currentBodyRb.velocity = Vector3.zero;
-    //     }
-
-    //     if (isMoving)
-    //         previousDistanceToTouchPos = (touchPosition - transform.position).magnitude;
-    // }
-
-
 }

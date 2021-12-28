@@ -48,9 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d4275f07794c4041af955b24507e0bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  currentBodyTransform: {fileID: 0}
   BulletPrefab: {fileID: 7014584256961518145, guid: d9183db1b9e8b8040b4e83f3bacb8094, type: 3}
+  GameManager: {fileID: 0}
 --- !u!114 &5234678287634951142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,7 +161,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2403014398574948710}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6, y: 0.84, z: 0.5}
+  m_LocalPosition: {x: 0, y: 1, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2403014398829395522}
@@ -305,6 +304,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53ea83f6ee56e264aa265934f4126dcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 5
+  currentHealth: 0
+  isMoving: 0
+  startRotation: {x: 0, y: 0, z: 0, w: 0}
+  playerRot: {x: 0, y: 0, z: 0, w: 0}
+  targetPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &2403014398649192934
 GameObject:
   m_ObjectHideFlags: 0
@@ -360,7 +365,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2403014398659616450}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6, y: 0.84, z: 0.5}
+  m_LocalPosition: {x: 0, y: 1, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2403014398642097004}
@@ -375,10 +380,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2403014398829395522}
+  - component: {fileID: 1982069117321298785}
   - component: {fileID: 6555725624376212302}
   - component: {fileID: 8801597431135096746}
   - component: {fileID: 981944529850670958}
-  - component: {fileID: 1982069117321298785}
   - component: {fileID: 5540038582309760825}
   m_Layer: 0
   m_Name: Player2
@@ -405,6 +410,22 @@ Transform:
   m_Father: {fileID: 2402761194882573211}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &1982069117321298785
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2403014398829395526}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 84
+  m_CollisionDetection: 0
 --- !u!136 &6555725624376212302
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -416,9 +437,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
-  m_Height: 1
+  m_Height: 1.65
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.82, z: 0}
 --- !u!114 &8801597431135096746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -475,22 +496,6 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!54 &1982069117321298785
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2403014398829395526}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 84
-  m_CollisionDetection: 0
 --- !u!114 &5540038582309760825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -503,6 +508,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53ea83f6ee56e264aa265934f4126dcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 5
+  currentHealth: 0
+  isMoving: 0
+  startRotation: {x: 0, y: 0, z: 0, w: 0}
+  playerRot: {x: 0, y: 0, z: 0, w: 0}
+  targetPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &2403014398914196069
 GameObject:
   m_ObjectHideFlags: 0
@@ -512,10 +523,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2403014398914196065}
+  - component: {fileID: 8082180415000377456}
   - component: {fileID: 6555725625434737544}
   - component: {fileID: 4342761998111344199}
   - component: {fileID: 8245021565279511489}
-  - component: {fileID: 8082180415000377456}
   - component: {fileID: 4897935476437329746}
   m_Layer: 0
   m_Name: Player3
@@ -542,6 +553,22 @@ Transform:
   m_Father: {fileID: 2402761194882573211}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &8082180415000377456
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2403014398914196069}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 84
+  m_CollisionDetection: 0
 --- !u!136 &6555725625434737544
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -553,9 +580,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
-  m_Height: 1
+  m_Height: 1.65
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.82, z: 0}
 --- !u!114 &4342761998111344199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -612,22 +639,6 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!54 &8082180415000377456
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2403014398914196069}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 84
-  m_CollisionDetection: 0
 --- !u!114 &4897935476437329746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -640,6 +651,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53ea83f6ee56e264aa265934f4126dcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 5
+  currentHealth: 0
+  isMoving: 0
+  startRotation: {x: 0, y: 0, z: 0, w: 0}
+  playerRot: {x: 0, y: 0, z: 0, w: 0}
+  targetPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &2403014399255935433
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,7 +712,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2403014399556878530}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.6, y: 0.84, z: 0.5}
+  m_LocalPosition: {x: 0, y: 1, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2403014398914196065}
