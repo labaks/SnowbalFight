@@ -8,10 +8,15 @@ using UnityEngine.EventSystems;
 public class PlayerControls : MonoBehaviour
 {
     public GameObject BulletPrefab;
+    public GameObject BulletPowerPanel;
+    public Image BulletPowerRange;
     public GameManager GameManager;
     private PhotonView photonView;
 
     bool canShoot = true;
+    bool ShootPanelShown = false;
+    bool firstClick = true;
+    float shootPowerCoef = 0.1f;
     PlayerBody[] children = new PlayerBody[3];
     PlayerBody currentBody;
     Transform firePoint;
@@ -46,6 +51,12 @@ public class PlayerControls : MonoBehaviour
         if (Mathf.Abs(currentBody.transform.rotation.y - currentBody.startRotation.y) <= 0.05f)
         {
             canShoot = true;
+        }
+        if (ShootPanelShown)
+        {
+            if (BulletPowerRange.fillAmount == 1f || BulletPowerRange.fillAmount == 0f)
+                shootPowerCoef = -shootPowerCoef;
+            BulletPowerRange.fillAmount += shootPowerCoef * Time.deltaTime * 10f;
         }
     }
 
@@ -96,7 +107,20 @@ public class PlayerControls : MonoBehaviour
     public void Shoot()
     {
         if (canShoot)
-            photonView.RPC("RPCFire", RpcTarget.All);
+        {
+            if (firstClick)
+            {
+                ShootPanelShown = true;
+            }
+            else
+            {
+                ShootPanelShown = false;
+                photonView.RPC("RPCFire", RpcTarget.All);
+                BulletPowerRange.fillAmount = 0f;
+            }
+            BulletPowerPanel.SetActive(ShootPanelShown);
+            firstClick = !ShootPanelShown;
+        }
     }
 
     [PunRPC]
@@ -108,7 +132,12 @@ public class PlayerControls : MonoBehaviour
         bullet = Instantiate(BulletPrefab, firePoint.position, Quaternion.identity) as GameObject;
         bullet
             .GetComponent<Bullet>()
-            .InitializeBullet(firePoint.forward, firePoint, Mathf.Abs(lag));
+            .InitializeBullet(
+                firePoint.forward,
+                firePoint,
+                Mathf.Abs(lag),
+                BulletPowerRange.fillAmount
+            );
     }
 
     void GetChildren()

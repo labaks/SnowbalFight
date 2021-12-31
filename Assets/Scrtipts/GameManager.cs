@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     public GameObject light;
     public GameObject shootBtnGO;
     public GameObject[] switcherBtns;
+    public GameObject BulletPowerPanel;
+    public Image BulletPowerRange;
 
     GameObject player;
     Button shootBtn;
@@ -37,6 +39,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (player.GetComponent<PhotonView>().IsMine)
         {
             player.GetComponent<PlayerControls>().GameManager = this;
+            player.GetComponent<PlayerControls>().BulletPowerPanel = BulletPowerPanel;
+            player.GetComponent<PlayerControls>().BulletPowerRange = BulletPowerRange;
             InitButton();
         }
     }
