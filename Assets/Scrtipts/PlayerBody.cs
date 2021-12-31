@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
 
 public class PlayerBody : MonoBehaviourPunCallbacks, IDamagable
 {
     [SerializeField]
     float speed = 5f;
-    [SerializeField]
     float currentHealth;
     float maxHealth = 100f;
     float rotSpeed = 10f;
@@ -16,6 +16,9 @@ public class PlayerBody : MonoBehaviourPunCallbacks, IDamagable
     public Quaternion startRotation;
     public Quaternion playerRot;
     public Vector3 targetPosition;
+    public Transform graphicTransform;
+    public Image healthBar;
+    public Text healthCount;
 
     PhotonView PV;
 
@@ -27,7 +30,9 @@ public class PlayerBody : MonoBehaviourPunCallbacks, IDamagable
     {
         currentHealth = maxHealth;
         PV = GetComponent<PhotonView>();
-        startRotation = transform.rotation;
+        startRotation = graphicTransform.rotation;
+        healthBar = transform.GetChild(4).GetChild(0).GetChild(0).GetComponent<Image>();
+        healthCount = healthBar.transform.GetChild(0).GetComponent<Text>();
     }
 
     void Update()
@@ -39,8 +44,8 @@ public class PlayerBody : MonoBehaviourPunCallbacks, IDamagable
         if (transform.position == targetPosition)
         {
             // Rotate to start rotation
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
+            graphicTransform.rotation = Quaternion.Slerp(
+                graphicTransform.rotation,
                 startRotation,
                 rotSpeed * Time.deltaTime
             );
@@ -50,8 +55,8 @@ public class PlayerBody : MonoBehaviourPunCallbacks, IDamagable
     void Move()
     {
         // Rotating to target position
-        transform.rotation = Quaternion.Slerp(
-            transform.rotation,
+        graphicTransform.rotation = Quaternion.Slerp(
+            graphicTransform.rotation,
             playerRot,
             rotSpeed * Time.deltaTime
         );
@@ -67,6 +72,7 @@ public class PlayerBody : MonoBehaviourPunCallbacks, IDamagable
 
     public void TakeDamage(float damage)
     {
+        Debug.Log(" took " + damage);
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
     }
 
@@ -78,7 +84,9 @@ public class PlayerBody : MonoBehaviourPunCallbacks, IDamagable
             return;
         }
         currentHealth -= damage;
-        Debug.Log("took " + damage);
+        Debug.Log(" took " + damage);
+        healthCount.text = currentHealth + " / " + maxHealth;
+        healthBar.fillAmount = currentHealth / maxHealth;
         if (currentHealth <= 0)
         {
             Die();

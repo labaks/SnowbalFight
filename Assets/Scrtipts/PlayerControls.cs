@@ -16,7 +16,8 @@ public class PlayerControls : MonoBehaviour
     bool canShoot = true;
     bool ShootPanelShown = false;
     bool firstClick = true;
-    float shootPowerCoef = 0.1f;
+    float shootPowerStep = 0.1f;
+    float shootPower;
     PlayerBody[] children = new PlayerBody[3];
     PlayerBody currentBody;
     Transform firePoint;
@@ -55,8 +56,8 @@ public class PlayerControls : MonoBehaviour
         if (ShootPanelShown)
         {
             if (BulletPowerRange.fillAmount == 1f || BulletPowerRange.fillAmount == 0f)
-                shootPowerCoef = -shootPowerCoef;
-            BulletPowerRange.fillAmount += shootPowerCoef * Time.deltaTime * 10f;
+                shootPowerStep = -shootPowerStep;
+            BulletPowerRange.fillAmount += shootPowerStep * Time.deltaTime * 15f;
         }
     }
 
@@ -115,6 +116,7 @@ public class PlayerControls : MonoBehaviour
             else
             {
                 ShootPanelShown = false;
+                shootPower = BulletPowerRange.fillAmount;
                 photonView.RPC("RPCFire", RpcTarget.All);
                 BulletPowerRange.fillAmount = 0f;
             }
@@ -136,7 +138,7 @@ public class PlayerControls : MonoBehaviour
                 firePoint.forward,
                 firePoint,
                 Mathf.Abs(lag),
-                BulletPowerRange.fillAmount
+                shootPower
             );
     }
 
@@ -145,7 +147,7 @@ public class PlayerControls : MonoBehaviour
         List<PlayerBody> tempList = new List<PlayerBody>();
         foreach (Transform child in transform)
         {
-            tempList.Add(child.GetComponent<PlayerBody>());
+            tempList.Add(child.GetChild(0).GetComponent<PlayerBody>());
         }
         children = tempList.ToArray();
     }

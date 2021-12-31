@@ -28,6 +28,7 @@ public class Bullet : MonoBehaviourPun
             && !other.gameObject.GetComponent<PhotonView>().IsMine
         )
         {
+            Debug.Log(other.gameObject.GetComponent<PhotonView>().ViewID + " " + other.gameObject.name);
             other.gameObject.GetComponent<IDamagable>()?.TakeDamage(attackDamage);
             Destroy(gameObject);
         }
@@ -43,7 +44,6 @@ public class Bullet : MonoBehaviourPun
         transform.forward = originalDirection;
 
         Rigidbody rigidbody = GetComponent<Rigidbody>();
-        Debug.Log(powerCoef);
         // rigidbody.AddForce(firePoint.forward * bulletForce, ForceMode.Impulse);
         rigidbody.velocity = originalDirection * bulletForce * powerCoef;
         rigidbody.position += rigidbody.velocity * lag;
