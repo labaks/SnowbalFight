@@ -5,14 +5,28 @@ using Photon.Pun;
 
 public class Bullet : MonoBehaviourPun
 {
-    public GameObject hitEffect;
     public int attackDamage = 30;
     public float bulletForce = 800f;
+    public float destroyTime;
 
-    public void Start()
+    private void Awake()
     {
-        Destroy(gameObject, 4f);
+        StartCoroutine("DestroyByTime");
     }
+
+    IEnumerator DestroyByTime()
+    {
+        yield return new WaitForSeconds(destroyTime);
+        this.GetComponent<PhotonView>().RPC("DestroyObject", RpcTarget.AllBuffered);
+    }
+
+    [PunRPC]
+    public void DestroyObject()
+    {
+        Destroy(this.gameObject);
+    }
+
+    private void Update() { }
 
     // public void OnCollisionEnter(Collision collision)
     // {
@@ -23,12 +37,17 @@ public class Bullet : MonoBehaviourPun
     private void OnTriggerEnter(Collider other)
     {
         // Debug.Log(other.gameObject.name);
+        if (!other.gameObject.GetComponent<PhotonView>() || !other.gameObject.GetComponent<PhotonView>().IsMine)
+            return;
+
         if (
             other.gameObject.GetComponent<PhotonView>()
             && !other.gameObject.GetComponent<PhotonView>().IsMine
         )
         {
-            Debug.Log(other.gameObject.GetComponent<PhotonView>().ViewID + " " + other.gameObject.name);
+            Debug.Log(
+                other.gameObject.GetComponent<PhotonView>().ViewID + " " + other.gameObject.name
+            );
             other.gameObject.GetComponent<IDamagable>()?.TakeDamage(attackDamage);
             Destroy(gameObject);
         }

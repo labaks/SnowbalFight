@@ -131,7 +131,7 @@ public class PlayerControls : MonoBehaviour
         float lag = (float)(PhotonNetwork.Time - info.SentServerTime);
         GameObject bullet;
 
-        bullet = Instantiate(BulletPrefab, firePoint.position, Quaternion.identity) as GameObject;
+        bullet = PhotonNetwork.Instantiate(BulletPrefab.name, firePoint.position, Quaternion.identity) as GameObject;
         bullet
             .GetComponent<Bullet>()
             .InitializeBullet(

@@ -72,7 +72,6 @@ public class PlayerBody : MonoBehaviourPunCallbacks, IDamagable
 
     public void TakeDamage(float damage)
     {
-        Debug.Log(" took " + damage);
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
     }
 
